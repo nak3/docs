@@ -90,6 +90,13 @@ kubectl patch deployments.apps -n knative-serving webhook -p '{"spec":{"template
 kubectl patch deployments.apps -n knative-serving istio-webhook -p '{"spec":{"template":{"metadata":{"annotations":{"sidecar.istio.io/inject":"false"}}}}}'
 ```
 
+If you deployed net-certmanager, you need to disable the injection for it.
+
+```
+kubectl patch deployments.apps -n knative-serving net-certmanager-webhook -p '{"spec":{"template":{"metadata":{"annotations":{"sidecar.istio.io/inject":"false"}}}}}'
+```
+
+
 You can check your system pods are running with sidecar by the output of `2/2` for `READY` column. If not, please restart pods in knative-serving namespace.
 
 _e.g. command to confirm system pods have sidecar_
@@ -141,9 +148,19 @@ EOF
 
 Now you can deploy your Knative application. Let's access to it.
 
+_e.g command to create knative application_
+
+```
+$ kn service create hello-example --image=gcr.io/knative-samples/helloworld-go -n serving-tests
+```
+
 _e.g command to request from another pod to knative app_
 
 ```bash
+$ wget https://raw.githubusercontent.com/istio/istio/1.6.1/samples/sleep/sleep.yaml
+$ kubectl apply -f <(istioctl kube-inject -f sleep.yaml)
+$ POD=$(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name})
+
 $ kubectl exec  -it $POD -c sleep -- curl -s hello-example.serving-tests.svc.cluster.local
 Hello World!
 ```
