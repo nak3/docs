@@ -49,7 +49,7 @@ that are active when running Knative Serving.
    webhook                  1         1         1            1           1h
    ```
 
-These services and deployments are installed by the `serving.yaml` file during
+These services and deployments are installed by the `serving-core.yaml` file during
 install. The next section describes their function.
 
 ## Components
